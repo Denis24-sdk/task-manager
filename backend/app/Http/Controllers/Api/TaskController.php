@@ -20,9 +20,9 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'due_date' => 'nullable|date',
+            'title' => 'required|string|min:3|max:40',
+            'description' => 'nullable|string|max:150',
+            'due_date' => 'nullable|date|after_or_equal:today',
         ]);
 
         if ($validator->fails()) {
@@ -49,9 +49,9 @@ class TaskController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'due_date' => 'nullable|date',
+            'title' => 'sometimes|required|string|min:3|max:40', // поле проверяется, только если оно пришло в запросе
+            'description' => 'nullable|string|max:150',
+            'due_date' => 'nullable|date|after_or_equal:today',
         ]);
 
         if ($validator->fails()) {
