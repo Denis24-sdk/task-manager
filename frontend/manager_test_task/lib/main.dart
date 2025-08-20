@@ -5,6 +5,14 @@ import 'package:manager_test_task/providers/task_provider.dart';
 import 'package:manager_test_task/screens/login_screen.dart';
 import 'package:manager_test_task/screens/task_list_screen.dart';
 
+class AppColors {
+  static const Color primaryBlue = Color(0xFF4A90E2);
+  static const Color lightBlueBackground = Color(0xFFF0F4F8);
+  static const Color cardBackground = Color(0xFFF5F5F7);
+  static const Color primaryText = Color(0xFF333333);
+  static const Color secondaryText = Color(0xFF888888);
+}
+
 void main() {
   runApp(const MyApp());
 }
@@ -18,9 +26,21 @@ class MyApp extends StatelessWidget {
       create: (context) => TaskProvider(),
       child: MaterialApp(
         title: 'Task Manager',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.blue,
           useMaterial3: true,
+          scaffoldBackgroundColor: AppColors.lightBlueBackground,
+          fontFamily: 'Poppins',
+
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.primaryBlue,
+            background: AppColors.lightBlueBackground,
+          ),
+
+          textTheme: const TextTheme(
+            titleLarge: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryText),
+            bodyMedium: TextStyle(color: AppColors.secondaryText),
+          ),
         ),
         home: const AuthCheck(),
       ),
