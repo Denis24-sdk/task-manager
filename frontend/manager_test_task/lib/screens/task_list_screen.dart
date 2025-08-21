@@ -23,127 +23,158 @@ class _TaskListScreenState extends State<TaskListScreen> {
     });
   }
 
-  Future<void> _showDeleteConfirmationDialog(BuildContext context, TaskProvider taskProvider, Task task) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: AppColors.cardBackground,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.lightBlueBackground,
+      body: Consumer<TaskProvider>(
+        builder: (context, taskProvider, child) {
+          if (taskProvider.isLoading && taskProvider.tasks.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return CustomScrollView(
+            cacheExtent: 500.0,
+            slivers: [
+              const _HeaderSliver(),
+              if (taskProvider.tasks.isEmpty)
+                const _EmptyStateSliver()
+              else
+                _TaskListSliver(tasks: taskProvider.tasks),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _HeaderSliver extends StatelessWidget {
+  const _HeaderSliver();
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Container(
+        padding: const EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0, bottom: 40.0),
+        decoration: const BoxDecoration(
+          color: AppColors.primaryBlue,
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(40.0),
+            bottomRight: Radius.circular(40.0),
           ),
-          title: const Text(
-            'Confirm Deletion',
-            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryText),
-          ),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  'Are you sure you want to delete this task?',
-                  style: TextStyle(color: AppColors.secondaryText),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.person, color: AppColors.primaryBlue),
                 ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.white30,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.add, color: Colors.white),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => const TaskFormScreen()),
+                        ).then((_) {
+                          Provider.of<TaskProvider>(context, listen: false).fetchTasks();
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.logout, color: Colors.white),
+                      onPressed: () {
+                        Provider.of<TaskProvider>(context, listen: false).logout();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        );
+                      },
+                    ),
+                  ],
+                )
               ],
             ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel', style: TextStyle(color: AppColors.secondaryText)),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Delete', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
-              onPressed: () {
-                taskProvider.deleteTask(task.id);
-                Navigator.of(dialogContext).pop();
-              },
+            const SizedBox(height: 20),
+            const Text('My Task', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+            const Text('Today', style: TextStyle(color: Colors.white70, fontSize: 16)),
+            const SizedBox(height: 10),
+            Center(
+              child: Text(
+                DateFormat('EEEE, d MMMM yyyy').format(DateTime.now()),
+                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+              ),
             ),
           ],
-        );
-      },
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0, bottom: 60.0),
-      decoration: const BoxDecoration(
-        color: AppColors.primaryBlue,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(40.0),
-          bottomRight: Radius.circular(40.0),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, color: AppColors.primaryBlue),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.add, color: Colors.white),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const TaskFormScreen()),
-                      ).then((_) {
-                        Provider.of<TaskProvider>(context, listen: false).fetchTasks();
-                      });
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.logout, color: Colors.white),
-                    onPressed: () {
-                      Provider.of<TaskProvider>(context, listen: false).logout();
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => const LoginScreen()),
-                      );
-                    },
-                  ),
-                ],
-              )
-            ],
-          ),
-          const SizedBox(height: 20),
-          const Text('My Task', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
-          const Text('Today', style: TextStyle(color: Colors.white70, fontSize: 16)),
-          const SizedBox(height: 10),
-          Center(
-            child: Text(
-              DateFormat('EEEE, d MMMM yyyy').format(DateTime.now()),
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
+    );
+  }
+}
+
+class _TaskListSliver extends StatelessWidget {
+  final List<Task> tasks;
+  const _TaskListSliver({required this.tasks});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+              (context, index) {
+            return _TaskCard(task: tasks[index]);
+          },
+          childCount: tasks.length,
+        ),
       ),
     );
   }
+}
 
-  Widget _buildTaskCard(Task task, TaskProvider taskProvider, BuildContext context) {
-    return Card(
-      color: AppColors.cardBackground,
-      margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-      elevation: 5.0,
-      shadowColor: AppColors.primaryBlue.withOpacity(0.2),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-      child: Padding(
+class _EmptyStateSliver extends StatelessWidget {
+  const _EmptyStateSliver();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(
+        child: Text(
+          'No tasks yet. Create one!',
+          style: TextStyle(fontSize: 18, color: AppColors.secondaryText),
+        ),
+      ),
+    );
+  }
+}
+
+class _TaskCard extends StatelessWidget {
+  final Task task;
+  const _TaskCard({required this.task});
+
+  @override
+  Widget build(BuildContext context) {
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      child: Container(
         padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(15.0),
+        ),
         child: Row(
           children: [
             Expanded(
@@ -162,7 +193,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryBlue.withOpacity(0.1),
+                      color: AppColors.primaryBlue10,
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                     child: Text(
@@ -181,16 +212,14 @@ class _TaskListScreenState extends State<TaskListScreen> {
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (context) => TaskFormScreen(task: task)),
-                    ).then((_){
+                    ).then((_) {
                       taskProvider.fetchTasks();
                     });
                   },
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                  onPressed: () {
-                    _showDeleteConfirmationDialog(context, taskProvider, task);
-                  },
+                  onPressed: () => _showDeleteConfirmationDialog(context, taskProvider, task),
                 ),
               ],
             ),
@@ -200,53 +229,30 @@ class _TaskListScreenState extends State<TaskListScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildHeader(context),
-          Container(
-            margin: const EdgeInsets.only(top: 220.0),
-            decoration: const BoxDecoration(
-              color: AppColors.lightBlueBackground,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(40.0),
-                topRight: Radius.circular(40.0),
-              ),
+  Future<void> _showDeleteConfirmationDialog(BuildContext context, TaskProvider taskProvider, Task task) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: AppColors.cardBackground,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          title: const Text('Confirm Deletion', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryText)),
+          content: const Text('Are you sure you want to delete this task?', style: TextStyle(color: AppColors.secondaryText)),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel', style: TextStyle(color: AppColors.secondaryText)),
+              onPressed: () => Navigator.of(dialogContext).pop(),
             ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(40.0),
-                topRight: Radius.circular(40.0),
-              ),
-              child: Consumer<TaskProvider>(
-                builder: (context, taskProvider, child) {
-                  if (taskProvider.isLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (taskProvider.tasks.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No tasks yet. Create one!',
-                        style: TextStyle(fontSize: 18, color: AppColors.secondaryText),
-                      ),
-                    );
-                  }
-                  return ListView.builder(
-                    padding: const EdgeInsets.only(top: 20.0, bottom: 20.0),
-                    itemCount: taskProvider.tasks.length,
-                    itemBuilder: (context, index) {
-                      final task = taskProvider.tasks[index];
-                      return _buildTaskCard(task, taskProvider, context);
-                    },
-                  );
-                },
-              ),
+            TextButton(
+              child: const Text('Delete', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              onPressed: () {
+                taskProvider.deleteTask(task.id);
+                Navigator.of(dialogContext).pop();
+              },
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 }

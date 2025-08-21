@@ -13,6 +13,9 @@ class AppColors {
   static const Color cardBackground = Color(0xFFF5F5F7);
   static const Color primaryText = Color(0xFF333333);
   static const Color secondaryText = Color(0xFF888888);
+
+  static const Color primaryBlue10 = Color(0x1A4A90E2);
+  static const Color white30 = Color(0x4DFFFFFF);
 }
 
 void main() {
