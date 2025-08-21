@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:manager_test_task/main.dart';
+import 'package:manager_test_task/screens/login_screen.dart';
 import 'package:manager_test_task/services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -85,15 +86,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Create Account',
-          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryText),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.primaryText),
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -104,6 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const SizedBox(height: 50),
                   const Center(
                     child: Icon(
                       Icons.person_add_alt_1_rounded,
@@ -200,7 +193,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => const LoginScreen()),
+                          );
                         },
                         child: const Text(
                           'Login',
