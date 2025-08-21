@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:manager_test_task/models/task.dart';
 
 class ApiService {
-  final String _baseUrl = "http://10.81.113.177:8000/api";
+  final String _baseUrl = "http://172.31.210.177:8000/api";
   final _storage = const FlutterSecureStorage();
 
   Future<String?> _getToken() async {

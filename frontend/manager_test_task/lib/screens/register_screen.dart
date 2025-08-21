@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:manager_test_task/main.dart';
 import 'package:manager_test_task/screens/login_screen.dart';
+import 'package:manager_test_task/screens/task_list_screen.dart';
 import 'package:manager_test_task/services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -40,7 +41,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           backgroundColor: Colors.green,
         ),
       );
-      Navigator.of(context).pop();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const TaskListScreen()),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

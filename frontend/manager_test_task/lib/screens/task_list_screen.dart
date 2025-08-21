@@ -56,7 +56,7 @@ class _HeaderSliver extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Container(
-        padding: const EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0, bottom: 40.0),
+        padding: const EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0, bottom: 5.0),
         decoration: const BoxDecoration(
           color: AppColors.primaryBlue,
           borderRadius: BorderRadius.only(
